@@ -15,7 +15,7 @@
 
 <details>
 <summary>Chat</summary>
-Messages are transfered in realtime using **WebSockets**. <br><br>
+Messages are transfered in realtime using WebSockets. <br><br>
 
 ![](https://pbs.twimg.com/media/FVGkQfOWUAA0zpE?format=png&name=large)
 ![WebSockets](https://upload.wikimedia.org/wikipedia/commons/1/10/Websocket_connection.png)
