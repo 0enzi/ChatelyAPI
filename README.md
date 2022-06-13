@@ -1,2 +1,2 @@
 # ChatelyAPI
-The backbone of the messenging for the text, voice &amp; video chat app  'Chately'
+Core API of the messenging for the text, voice &amp; video chat app  'Chately'
