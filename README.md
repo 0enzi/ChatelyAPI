@@ -15,8 +15,16 @@
 
 <details>
 <summary>Chat</summary>
-Messages are transfered in realtime using WebSockets. <br><br>
+Messages are transfered in realtime using [WebSockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) . <br>
 
 ![](https://pbs.twimg.com/media/FVGkQfOWUAA0zpE?format=png&name=large)
 ![WebSockets](https://upload.wikimedia.org/wikipedia/commons/1/10/Websocket_connection.png)
+</details>
+
+<summary>Voice</summary>
+...
+</details>
+
+<summary>Video</summary>
+WebRTC
 </details>
