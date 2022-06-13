@@ -21,10 +21,12 @@ Messages are transfered in realtime using [WebSockets](https://developer.mozilla
 ![WebSockets](https://upload.wikimedia.org/wikipedia/commons/1/10/Websocket_connection.png)
 </details>
 
+<details>
 <summary>Voice</summary>
 ...
 </details>
 
+<details>
 <summary>Video</summary>
 WebRTC
 </details>
