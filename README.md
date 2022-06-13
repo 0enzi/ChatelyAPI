@@ -18,7 +18,9 @@
 Messages are transfered in realtime using [WebSockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) . <br>
 
 ![](https://pbs.twimg.com/media/FVGkQfOWUAA0zpE?format=png&name=large)
-![WebSockets](https://upload.wikimedia.org/wikipedia/commons/1/10/Websocket_connection.png)
+
+Raw Demo
+![](https://media.discordapp.net/attachments/981556925814681704/985438999009169408/unknown.png)
 </details>
 
 <details>
