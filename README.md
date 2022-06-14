@@ -1,15 +1,18 @@
 # Chately
+
 **Instant messaging & voice-over-IP WebApp**
 
 ## 1. Tech Stack
-| Front-end ([@alicalimli](https://github.com/alicalimli)) | Back-end ([@elvisnchege](https://github.com/elvisnchege))              | Database          |
-| ------------------------ |:-----------------------------------:| -----------------:|
-| React [**Javascript**]   | FastAPI [**Python**], Javascipt, C  | Redis, PostgreSQL |
+
+| Front-end ([@alicalimli](https://github.com/alicalimli)) | Back-end ([@elvisnchege](https://github.com/elvisnchege)) |          Database |
+| -------------------------------------------------------- | :-------------------------------------------------------: | ----------------: |
+| React [**Javascript**]                                   |            FastAPI [**Python**], Javascipt, C             | Redis, PostgreSQL |
 
 ## 2. How it works
-### Front-end
-//ali explains here
 
+### Front-end
+
+//ali explains here
 
 ### Back-end (You are here)
 
@@ -21,6 +24,7 @@ Messages are transfered in realtime using [WebSockets](https://developer.mozilla
 
 Raw Demo
 ![](https://media.discordapp.net/attachments/981556925814681704/985438999009169408/unknown.png)
+
 </details>
 
 <details>
