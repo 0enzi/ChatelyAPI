@@ -4,7 +4,7 @@
 
 ## 1. Tech Stack
 
-| Front-end ([@alicalimli](https://github.com/alicalimli)) | Back-end ([@elvisnchege](https://github.com/elvisnchege)) |          Database |
+| Front-end ([@alicalimli](https://github.com/alicalimli)) | Back-end ([@elvischege](https://github.com/elvischege)) |          Database |
 | -------------------------------------------------------- | :-------------------------------------------------------: | ----------------: |
 | React [**Javascript**]                                   |            FastAPI [**Python**], Javascipt, C             | Redis, PostgreSQL |
 
@@ -12,7 +12,7 @@
 
 ### Front-end
 
-//ali explains here
+...
 
 ### Back-end (You are here)
 
