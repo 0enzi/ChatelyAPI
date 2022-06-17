@@ -4,12 +4,15 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app import schemas, crud
+
+from app.schemas import product as product_schema
+from app.schemas import message as message_schema
 from app.api.deps import get_db
 
 router = APIRouter()
 
 
-@router.get("", response_model=List[schemas.ProductResponse])
+@router.get("", response_model=List[product_schema.ProductResponse])
 def read_products(db: Session = Depends(get_db), skip: int = 0, limit: int = 100) -> Any:
     """
     Retrieve all products.
@@ -18,8 +21,8 @@ def read_products(db: Session = Depends(get_db), skip: int = 0, limit: int = 100
     return products
 
 
-@router.post("", response_model=schemas.ProductResponse)
-def create_product(*, db: Session = Depends(get_db), product_in: schemas.ProductCreate) -> Any:
+@router.post("", response_model=product_schema.ProductResponse)
+def create_product(*, db: Session = Depends(get_db), product_in: product_schema.ProductCreate) -> Any:
     """
     Create new products.
     """
@@ -27,8 +30,8 @@ def create_product(*, db: Session = Depends(get_db), product_in: schemas.Product
     return product
 
 
-@router.put("", response_model=schemas.ProductResponse)
-def update_product(*, db: Session = Depends(get_db), product_in: schemas.ProductUpdate) -> Any:
+@router.put("", response_model=product_schema.ProductResponse)
+def update_product(*, db: Session = Depends(get_db), product_in: product_schema.ProductUpdate) -> Any:
     """
     Update existing products.
     """
@@ -42,7 +45,7 @@ def update_product(*, db: Session = Depends(get_db), product_in: schemas.Product
     return product
 
 
-@router.delete("", response_model=schemas.Message)
+@router.delete("", response_model=message_schema.Message)
 def delete_product(*, db: Session = Depends(get_db), id: int) -> Any:
     """
     Delete existing product.
