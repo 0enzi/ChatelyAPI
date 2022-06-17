@@ -1,24 +1,24 @@
-from typing import Optional
+# from typing import Optional
 
-from pydantic import BaseModel
-
-
-class ProductBase(BaseModel):
-    id: Optional[int]
-    name: Optional[str]
-    price: Optional[float]
+# from pydantic import BaseModel
 
 
-class ProductCreate(ProductBase):
-    name: str
-    price: float
+# class ProductBase(BaseModel):
+#     id: Optional[int]
+#     name: Optional[str]
+#     price: Optional[float]
 
 
-class ProductUpdate(ProductBase):
-    id: int
-    pass
+# class ProductCreate(ProductBase):
+#     name: str
+#     price: float
 
 
-class ProductResponse(ProductBase):
-    class Config:
-        orm_mode = True
+# class ProductUpdate(ProductBase):
+#     id: int
+#     pass
+
+
+# class ProductResponse(ProductBase):
+#     class Config:
+#         orm_mode = True
