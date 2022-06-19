@@ -3,12 +3,12 @@ from pydantic import BaseModel
 
 class Message(BaseModel):
     id: int
-    from_id: int
-    to_id: int
+    sender_id: int
+    recipient_id: int
     msg: str
-    datetime: str
-    message: str
-
+    timestamp: str
+    read: bool
+ 
 
 ############################################
 #### (🧑🏼‍🦲) John Doe              ############

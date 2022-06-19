@@ -12,6 +12,7 @@ class UserCreate(BaseModel):
     active: Optional[bool] = True
     status: bool
     profile: str
+    websocket_id: str
 
 
 class UserOut(BaseModel):
@@ -19,7 +20,10 @@ class UserOut(BaseModel):
     username: str
     email: EmailStr
     created_at: datetime
+    active: Optional[bool] = True
+    status: bool
     profile: str
-
+    websocket_id: str
+    
     class Config:
         orm_mode = True
