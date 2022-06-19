@@ -1,3 +1,5 @@
+import sys
+sys.dont_write_bytecode = True # annoying pycache remove
 import uvicorn
 
 from fastapi import FastAPI
@@ -7,8 +9,6 @@ from app.core import settings
 from app.models import user, message, inbox
 from app.database import session
 
-import sys
-sys.dont_write_bytecode = True # annoying pycache remove
 
 
 app = FastAPI(title=settings.PROJECT_NAME)
