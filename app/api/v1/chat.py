@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app import schemas, crud
 
 
-from app.schemas import message as message_schema
+from app.schemas import chat as message_schema
 from app.api.deps import get_db
 
 router = APIRouter()

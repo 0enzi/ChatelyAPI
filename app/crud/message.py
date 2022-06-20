@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.crud.base import CRUDBase
 from app.models.message import Message
-from app.schemas.chat import MessageSchem, MessageUpdate
+from app.schemas.chat import Message as MessageSchem, MessageUpdate
 
 
 class CRUDMessage(CRUDBase[Message, MessageSchem, MessageUpdate]):
