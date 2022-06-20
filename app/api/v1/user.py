@@ -5,6 +5,7 @@ from fastapi import  status, HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session
 from app.api.deps import get_db 
 from app import utils
+import time
 
 router = APIRouter()
 
@@ -30,9 +31,10 @@ def get_user(id: int, db: Session = Depends(get_db)):
 
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=user_schema.UserOut)
 def create_user(user: user_schema.UserCreate, db: Session = Depends(get_db)):
-
+     timestamp = time.time()
      hashed_pw = utils.hash(user.password)
      user.password = hashed_pw
+     user.websocket_id = timestamp
      new_user = UserModel(**user.dict())
      db.add(new_user)
      db.commit()
