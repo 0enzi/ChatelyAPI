@@ -9,6 +9,8 @@ class Message(BaseModel):
     timestamp: str
     read: bool
  
+class MessageUpdate(BaseModel):
+    msg: str
 
 ############################################
 #### (🧑🏼‍🦲) John Doe              ############
