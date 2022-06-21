@@ -10,6 +10,6 @@ from app.schemas.chat import Message as MessageSchem, MessageUpdate
 class CRUDMessage(CRUDBase[Message, MessageSchem, MessageUpdate]):
     # Declare model specific CRUD operation methods.
     pass
-
+    
 
 message = CRUDMessage(Message)
