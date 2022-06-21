@@ -2,7 +2,7 @@
 from typing import List, Any
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-
+import time
 from app import schemas, crud
 
 
@@ -26,5 +26,8 @@ def create_message(*, db: Session = Depends(get_db), message_in: message_schema.
     """
     Create new messages.
     """
+    message_in.timestamp = str(time.time())
+    # print(message_in)
     message = crud.message.create(db, obj_in=message_in)
+    # print(dict(message))
     return message
