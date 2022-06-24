@@ -18,8 +18,9 @@ def read_messages(db: Session = Depends(get_db), skip: int = 0, limit: int = 100
     Retrieve all messages.
     """
     print(db)
-    messages = crud.messages.get_multi(db, skip=skip, limit=limit)
+    messages = crud.message.get_multi(db, skip=skip, limit=limit)
     return messages
+
 
 @router.post("", response_model=message_schema.Message)
 def create_message(*, db: Session = Depends(get_db), message_in: message_schema.Message) -> Any:
@@ -28,6 +29,9 @@ def create_message(*, db: Session = Depends(get_db), message_in: message_schema.
     """
     message_in.timestamp = str(time.time())
     # print(message_in)
-    message = crud.message.create(db, obj_in=message_in)
-    # print(dict(message))
-    return message
+    try:
+        message = crud.message.create(db, obj_in=message_in)
+
+    except Exception as e:
+        return {'msg': e}
+    return message_in
