@@ -12,8 +12,6 @@ from app.api.deps import get_db
 router = APIRouter()
 
 
-def update_inbox(db: Session):
-    print(db)
 
 # @router.get("", response_model=List[message_schema.Message])
 @router.get("")
@@ -26,7 +24,11 @@ def read_messages(db: Session = Depends(get_db), skip: int = 0, limit: int = 100
     return messages
 
 
-# @router.get('/inbox')
+
+def update_inbox(new_message, db: Session):
+
+    # Get sender and recipient ids and create an inbox hash
+    print(f'{new_message.sender_id}-{new_message.recipient_id}')
 
 
 @router.post("", response_model=message_schema.Message)
@@ -46,8 +48,7 @@ def create_message(*, db: Session = Depends(get_db), message_in: message_schema.
     inbox is a connection between the sender and the recipient
     inbox helps us filter
     '''
-    background_tasks.add_task(update_inbox)
+    background_tasks.add_task(update_inbox, message_in, db)
 
 
-    print(type(message))
     return message_in # potential bug
