@@ -8,7 +8,15 @@ class Message(BaseModel):
     msg: str
     timestamp: str
     read: bool
- 
+
+class MessageCreate(BaseModel):
+    sender_id: int
+    recipient_id: int
+    msg: str
+    timestamp: str
+    read: bool
+
+    
 class MessageUpdate(BaseModel):
     msg: str
 

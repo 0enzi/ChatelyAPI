@@ -4,8 +4,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 import time
 from app import schemas, crud
-
-
+from app.models import inbox as inbox_model
 from app.schemas import chat as message_schema
 from app.api.deps import get_db
 
@@ -29,9 +28,9 @@ def update_inbox(new_message, db: Session):
 
     # Get sender and recipient ids and create an inbox hash
     print(f'{new_message.sender_id}-{new_message.recipient_id}')
+    print(db.query(inbox_model.Inbox).filter(inbox_model.Inbox.inbox_hash == '0-3').first())
 
-
-@router.post("", response_model=message_schema.Message)
+@router.post("", response_model=message_schema.MessageCreate)
 def create_message(*, db: Session = Depends(get_db), message_in: message_schema.Message, background_tasks: BackgroundTasks) -> Any:
     """
     Create new messages.
