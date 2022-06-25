@@ -27,8 +27,27 @@ def read_messages(db: Session = Depends(get_db), skip: int = 0, limit: int = 100
 def update_inbox(new_message, db: Session):
 
     # Get sender and recipient ids and create an inbox hash
-    print(f'{new_message.sender_id}-{new_message.recipient_id}')
-    print(db.query(inbox_model.Inbox).filter(inbox_model.Inbox.inbox_hash == '0-3').first())
+    inbox_hash = f'{new_message.sender_id}-{new_message.recipient_id}'
+    exists = db.query(inbox_model.Inbox).filter(inbox_model.Inbox.inbox_hash == inbox_hash).first() is not None
+    
+    if exists: # dont think if else is needed asthey both do the same thing
+        inbox_item = db.query(inbox_model.Inbox).filter_by(inbox_hash =  inbox_hash).one()
+        inbox_item.last_message = new_message.msg
+
+        db.add(inbox_item)
+        db.commit()
+        db.refresh(inbox_item)
+    else:
+        inbox_item = inbox_model.Inbox(
+            inbox_hash=inbox_hash, 
+            last_message=new_message.msg,
+            user_id=new_message.recipient_id,
+            sender_id=new_message.sender_id)
+        db.add(inbox_item)
+        db.commit()
+        db.refresh(inbox_item)
+    
+
 
 @router.post("", response_model=message_schema.MessageCreate)
 def create_message(*, db: Session = Depends(get_db), message_in: message_schema.Message, background_tasks: BackgroundTasks) -> Any:
@@ -38,7 +57,7 @@ def create_message(*, db: Session = Depends(get_db), message_in: message_schema.
     message_in.timestamp = str(time.time())
     # print(message_in)
 
-    message = crud.message.create(db, obj_in=message_in)
+    # crud.message.create(db, obj_in=message_in)
 
     ''' 
     INBOX: 
