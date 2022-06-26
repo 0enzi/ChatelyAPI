@@ -76,23 +76,16 @@ async def get():
 @router.websocket('/chat')
 async def websocket(websocket: WebSocket, 
                     token: str = Depends(oauth2_scheme)):
-    print('oijoij')
     await websocket.accept()
-    while True:
-        data = await websocket.receive_text()
-        await websocket.send_text(data)
-        
-    # try:
-    #     user = get_current_user(token)
-    # #     Authorize.jwt_required("websocket",token=token)
-    # #     # Authorize.jwt_optional("websocket",token=token)
-    # #     # Authorize.jwt_refresh_token_required("websocket",token=token)
-    # #     # Authorize.fresh_jwt_required("websocket",token=token)
-    #     await websocket.send_text("Successfully Login!")
-    # #     decoded_token = Authorize.get_raw_jwt(token)
-    #     await websocket.send_text(f"Here your token: {token}")
-    #     await websocket.send_text(f"This is your name: {user}")
-    # except Exception as e:
-    #     await websocket.send_text(e)
-    #     await websocket.close()
-    # print(token, get_current_user(token))
+    try:
+        user = get_current_user(token)
+        await websocket.send_text("Login Successful!")
+        while True:
+            data = await websocket.receive_text()
+            await websocket.send_text(data)
+            await websocket.send_text("Login Successful!")
+            await websocket.send_text(f"You are {get_current_user(token)}")
+    except Exception as e:
+        await websocket.send_text(e)
+        await websocket.close()
+
