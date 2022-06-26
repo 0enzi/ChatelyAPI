@@ -7,8 +7,8 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from fastapi.security import OAuth2PasswordBearer
 from app.schemas.token import Token, TokenData
-from app.schemas.user import User
-from utils import fake_users_db
+from app.schemas.user import UserOut as User
+from .utils import fake_users_db
 
 # Security
 import os
@@ -19,6 +19,7 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
 
 def create_access_token(data: dict):
     to_encode = data.copy()
@@ -36,7 +37,7 @@ def get_user(db, username: str):
 
 class UserInDB(User):
     hashed_password: str
-    
+
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,

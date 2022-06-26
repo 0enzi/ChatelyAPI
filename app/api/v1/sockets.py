@@ -1,39 +1,63 @@
 from typing import Union
-from fastapi import Cookie, Depends, Query, WebSocket, status
+from fastapi import Cookie, Depends, Query, Request, WebSocket, status
 from fastapi.responses import HTMLResponse
 from fastapi import APIRouter
 from pydantic import BaseModel 
-
+from fastapi.security import OAuth2PasswordBearer
 
 import os
 from dotenv import load_dotenv
 load_dotenv()
 SECRET_KEY = os.getenv('SECRET_KEY')
-from app.oauth2 import oauth2_scheme, get_current_user
+from app.oauth2 import get_current_user
+
+
+
+class CustomOAuth2PasswordBearer(OAuth2PasswordBearer):
+    async def __call__(self, request: Request = None, websocket: WebSocket = None):
+        return await super().__call__(request or websocket)
+
+
+oauth2_scheme = CustomOAuth2PasswordBearer(tokenUrl="login")
+
 html = """
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Authorize</title>
+        <title>Chat</title>
     </head>
     <body>
-        <h1>WebSocket Authorize</h1>
-        <p>Token:</p>
-        <textarea id="token" rows="4" cols="50"></textarea><br><br>
-        <button onclick="websocketfun()">Send</button>
+        <h1>WebSocket Chat</h1>
+        <form action="" onsubmit="sendMessage(event)">
+            <label>Item ID: <input type="text" id="itemId" autocomplete="off" value="foo"/></label>
+            <label>Token: <input type="text" id="token" autocomplete="off" value="some-key-token"/></label>
+            <button onclick="connect(event)">Connect</button>
+            <hr>
+            <label>Message: <input type="text" id="messageText" autocomplete="off"/></label>
+            <button>Send</button>
+        </form>
         <ul id='messages'>
         </ul>
         <script>
-            const websocketfun = () => {
-                let token = document.getElementById("token").value
-                let ws = new WebSocket(`ws://192.168.18.202:8000/ws?token=${token}`)
-                ws.onmessage = (event) => {
-                    let messages = document.getElementById('messages')
-                    let message = document.createElement('li')
-                    let content = document.createTextNode(event.data)
+        var ws = null;
+            function connect(event) {
+                var itemId = document.getElementById("itemId")
+                var token = document.getElementById("token")
+                ws = new WebSocket("ws://localhost:8000/api/v1/ws/chat" + "?token=" + token.value);
+                ws.onmessage = function(event) {
+                    var messages = document.getElementById('messages')
+                    var message = document.createElement('li')
+                    var content = document.createTextNode(event.data)
                     message.appendChild(content)
                     messages.appendChild(message)
-                }
+                };
+                event.preventDefault()
+            }
+            function sendMessage(event) {
+                var input = document.getElementById("messageText")
+                ws.send(input.value)
+                input.value = ''
+                event.preventDefault()
             }
         </script>
     </body>
@@ -49,18 +73,26 @@ class Settings(BaseModel):
 async def get():
     return HTMLResponse(html)
 
-@router.websocket('/ws')
-async def websocket(websocket: WebSocket, token: str = Depends(oauth2_scheme)):
-    # await websocket.accept()
+@router.websocket('/chat')
+async def websocket(websocket: WebSocket, 
+                    token: str = Depends(oauth2_scheme)):
+    print('oijoij')
+    await websocket.accept()
+    while True:
+        data = await websocket.receive_text()
+        await websocket.send_text(data)
+        
     # try:
-    #     Authorize.jwt_required("websocket",token=token)
-    #     # Authorize.jwt_optional("websocket",token=token)
-    #     # Authorize.jwt_refresh_token_required("websocket",token=token)
-    #     # Authorize.fresh_jwt_required("websocket",token=token)
+    #     user = get_current_user(token)
+    # #     Authorize.jwt_required("websocket",token=token)
+    # #     # Authorize.jwt_optional("websocket",token=token)
+    # #     # Authorize.jwt_refresh_token_required("websocket",token=token)
+    # #     # Authorize.fresh_jwt_required("websocket",token=token)
     #     await websocket.send_text("Successfully Login!")
-    #     decoded_token = Authorize.get_raw_jwt(token)
-    #     await websocket.send_text(f"Here your decoded token: {decoded_token}")
-    # except AuthJWTException as err:
-    #     await websocket.send_text(err.message)
+    # #     decoded_token = Authorize.get_raw_jwt(token)
+    #     await websocket.send_text(f"Here your token: {token}")
+    #     await websocket.send_text(f"This is your name: {user}")
+    # except Exception as e:
+    #     await websocket.send_text(e)
     #     await websocket.close()
-    print(token, get_current_user(token))
+    # print(token, get_current_user(token))
