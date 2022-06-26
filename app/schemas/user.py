@@ -11,7 +11,6 @@ class UserCreate(BaseModel):
     status: bool
     created_at: datetime
     is_active: Optional[bool] = True
-    
     profile: str
     websocket_id: str
 

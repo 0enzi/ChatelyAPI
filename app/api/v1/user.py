@@ -34,7 +34,7 @@ def create_user(user: user_schema.UserCreate, db: Session = Depends(get_db)):
      timestamp = time.time()
      hashed_pw = utils.hash(user.password)
      user.password = hashed_pw
-     user.websocket_id = timestamp
+     user.websocket_id = str(timestamp)
      new_user = UserModel(**user.dict())
      db.add(new_user)
      db.commit()
