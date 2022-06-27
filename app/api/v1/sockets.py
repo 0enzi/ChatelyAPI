@@ -1,5 +1,5 @@
 from typing import Union
-from fastapi import Cookie, Depends, Query, Request, WebSocket, status
+from fastapi import Cookie, Depends, HTTPException, Query, Request, WebSocket, status
 from fastapi.responses import HTMLResponse
 from fastapi import APIRouter
 from pydantic import BaseModel 
@@ -76,7 +76,8 @@ class Settings(BaseModel):
     authjwt_secret_key: str = os.getenv('SECRET_KEY')
 
 @router.get("/")
-async def get():
+async def get(token: str = Depends(oauth2_scheme)):
+    
     return HTMLResponse(html)
 
 @router.websocket('/chat')

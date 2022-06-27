@@ -27,7 +27,7 @@
         var itemId = document.getElementById("itemId");
         var token = document.getElementById("token");
         ws = new WebSocket(
-          "ws://localhost:8000/api/v1/ws/chat" + "?token=" + token.value
+          "ws://localhost:8000/api/v1/ws/ws2" + "?token=" + token.value
         );
         ws.onmessage = function (event) {
           var messages = document.getElementById("messages");

@@ -1,5 +1,6 @@
 from typing import List
 from app.models.user import User as UserModel
+from app.oauth2 import get_current_active_user
 from app.schemas import user as user_schema
 from fastapi import  status, HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session
@@ -20,9 +21,10 @@ def get_users(db: Session = Depends(get_db)):
      return users 
 
 @router.get('/{id}', response_model=user_schema.UserOut)
-def get_user(id: int, db: Session = Depends(get_db)):
+def get_user(id: int, db: Session = Depends(get_db), current_user: UserModel = Depends(get_current_active_user)):
 
      user = db.query(UserModel).filter(UserModel.id ==id).first()
+     print(current_user)
 
      if not user:
           raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'User with id: {id} was not found')
