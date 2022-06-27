@@ -5,12 +5,18 @@ from fastapi import APIRouter
 from pydantic import BaseModel 
 from fastapi.security import OAuth2PasswordBearer
 
+
+from typing import Optional
+
+from fastapi import WebSocket, Depends, FastAPI
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from starlette.requests import Request
+from starlette.testclient import TestClient
 import os
 from dotenv import load_dotenv
 load_dotenv()
 SECRET_KEY = os.getenv('SECRET_KEY')
 from app.oauth2 import get_current_user
-
 
 
 class CustomOAuth2PasswordBearer(OAuth2PasswordBearer):
@@ -43,7 +49,7 @@ html = """
             function connect(event) {
                 var itemId = document.getElementById("itemId")
                 var token = document.getElementById("token")
-                ws = new WebSocket("ws://localhost:8000/api/v1/ws/chat" + "?token=" + token.value);
+                ws = new WebSocket("ws://localhost:8000/api/v1/ws/ws2" + "?token=" + token.value);
                 ws.onmessage = function(event) {
                     var messages = document.getElementById('messages')
                     var message = document.createElement('li')
@@ -74,7 +80,8 @@ async def get():
     return HTMLResponse(html)
 
 @router.websocket('/chat')
-async def websocket(websocket: WebSocket, 
+async def websocket(websocket: WebSocket,
+    
                     token: str = Depends(oauth2_scheme)):
     await websocket.accept()
     try:
@@ -89,3 +96,33 @@ async def websocket(websocket: WebSocket,
         await websocket.send_text(e)
         await websocket.close()
 
+
+class JWTAuth(HTTPBearer):
+
+    async def __call__(self, request: Request=None, websocket: WebSocket=None) -> Optional[HTTPAuthorizationCredentials]:
+        request = request or websocket
+        if not request:
+            if self.auto_error:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Not authenticated"
+                )
+            return None
+        return await super().__call__(request)
+
+
+@router.websocket('/ws2')
+async def socket(
+    websocket: WebSocket,
+    bearer_token: HTTPAuthorizationCredentials = Depends(JWTAuth())
+):
+    await websocket.accept()
+    await websocket.send_text("hello there")
+    await websocket.close()
+
+
+# def test_socket():
+#     client = TestClient(app)
+#     with client.websocket_connect("/", headers={'authorization': 'Bearer this works'}) as ws:
+#         ws.receive_text()
+#         ws.close()
