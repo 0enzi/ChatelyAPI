@@ -1,6 +1,6 @@
 from typing import List
+from uuid import uuid4
 from app.models.user import User as UserModel
-from app.oauth2 import get_current_active_user
 from app.schemas import user as user_schema
 from fastapi import  status, HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session
@@ -21,10 +21,9 @@ def get_users(db: Session = Depends(get_db)):
      return users 
 
 @router.get('/{id}', response_model=user_schema.UserOut)
-def get_user(id: int, db: Session = Depends(get_db), current_user: UserModel = Depends(get_current_active_user)):
+def get_user(id: int, db: Session = Depends(get_db)):
 
      user = db.query(UserModel).filter(UserModel.id ==id).first()
-     print(current_user)
 
      if not user:
           raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'User with id: {id} was not found')
@@ -44,3 +43,19 @@ def create_user(user: user_schema.UserCreate, db: Session = Depends(get_db)):
      return new_user 
 
 
+# @router.post('/signup', summary="Create new user", response_model=user_schema.UserOut)
+# async def create_user(data: user_schema.UserAuth, db: Session = Depends(get_db)):
+    # querying database to check if user already exist
+#     user = db.get(data.email, None)
+#     if user is not None:
+#             raise HTTPException(
+#             status_code=status.HTTP_400_BAD_REQUEST,
+#             detail="User with this email already exist"
+#         )
+#     user = {
+#         'email': data.email,
+#         'password': utils.get_hashed_password(data.password),
+#         'id': str(uuid4())
+#     }
+#     db[data.email] = user    # saving user to database
+#     return user
