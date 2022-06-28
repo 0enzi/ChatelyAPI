@@ -16,7 +16,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 SECRET_KEY = os.getenv('SECRET_KEY')
-from app.utils import get_current_user, oauth2_scheme
+from app.utils import get_current_user
 
 
 class CustomOAuth2PasswordBearer(OAuth2PasswordBearer):
@@ -24,7 +24,7 @@ class CustomOAuth2PasswordBearer(OAuth2PasswordBearer):
         return await super().__call__(request or websocket)
 
 
-# oauth2_scheme = CustomOAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
+oauth2_scheme = CustomOAuth2PasswordBearer(tokenUrl="/api/v2/auth/login")
 
 html = """
 <!DOCTYPE html>
@@ -49,7 +49,7 @@ html = """
             function connect(event) {
                 var itemId = document.getElementById("itemId")
                 var token = document.getElementById("token")
-                ws = new WebSocket("ws://localhost:8000/api/v1/ws/ws2" + "?token=" + token.value);
+                ws = new WebSocket("ws://localhost:8000/api/v1/ws/chat" + "?token=" + token.value);
                 ws.onmessage = function(event) {
                     var messages = document.getElementById('messages')
                     var message = document.createElement('li')
@@ -76,27 +76,29 @@ class Settings(BaseModel):
     authjwt_secret_key: str = os.getenv('SECRET_KEY')
 
 @router.get("/")
-async def get(token: str = Depends(oauth2_scheme)):
-
+async def get():
     return HTMLResponse(html)
 
-@router.websocket('/chat')
-async def websocket(websocket: WebSocket,
-    
-                    token: str = Depends(oauth2_scheme)):
-    await websocket.accept()
-    try:
-        user = get_current_user(token)
-        await websocket.send_text("Login Successful!")
-        while True:
-            data = await websocket.receive_text()
-            await websocket.send_text(data)
-            await websocket.send_text("Login Successful!")
-            await websocket.send_text(f"You are {get_current_user(token)}")
-    except Exception as e:
-        await websocket.send_text(e)
-        await websocket.close()
+async def get_cookie_or_token(
+    websocket: WebSocket,
+    session: Union[str, None] = Cookie(default=None),
+    token: Union[str, None] = Query(default=None),
+):
+    if session is None and token is None:
+        await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+    return session or token
 
+@router.websocket('/chat')
+async def websocket(websocket: WebSocket, 
+                    token: str = Depends(get_cookie_or_token)):
+    await websocket.accept()
+    data = await websocket.receive_text()
+    await websocket.send_text("Login Successful!")
+    while True:
+        data = await websocket.receive_text()
+        await websocket.send_text(f"Query Token value for this session is: {token}")
+        await websocket.send_text(f"Message Text was: {data}")
+        
 
 class JWTAuth(HTTPBearer):
 
@@ -127,3 +129,4 @@ async def socket(
 #     with client.websocket_connect("/", headers={'authorization': 'Bearer this works'}) as ws:
 #         ws.receive_text()
 #         ws.close()
+
