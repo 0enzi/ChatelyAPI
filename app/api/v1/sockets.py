@@ -1,6 +1,6 @@
-from typing import Union
+from typing import List, Union
 from urllib.request import Request
-from fastapi import Cookie, Depends, Query, WebSocket, status
+from fastapi import Cookie, Depends, Query, WebSocket, WebSocketDisconnect, status
 from fastapi.responses import HTMLResponse
 from fastapi import APIRouter
 from fastapi import WebSocket, Depends
@@ -89,24 +89,24 @@ async def get_cookie_or_token(
     token: Union[str, None] = Query(default=None),
 ):
 
-
-
     if session is None and token is None:
         await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
     return session or token
 
-@router.websocket('/chat')
-async def websocket(websocket: WebSocket, 
-                    token: str = Depends(get_cookie_or_token)):
-    await websocket.accept()
+@router.websocket('/chat/{client_id}')
+async def websocket(websocket: WebSocket,   
+                    client_id: int,
+                    # token: str = Depends(get_cookie_or_token)
+                    ):
     
-
-    data = await websocket.receive_text()
-    await websocket.send_text(data)
-    await websocket.send_text("Login Successful!")
-    await websocket.send_text(f"Query Token value for this session is: {token}")
-    while True:
-        data = await websocket.receive_text()
-        await websocket.send_text(f"Message Text was: {data}")
-        
-
+    await manager.connect(websocket)
+    await websocket.send_text(f"Connected Successfully!!")
+    await websocket.send_text(f"Access Token for this session will be eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NTY1Njc5MjQsInN1YiI6ImFkbWluQGNoYXRlbHkuaW8ifQ.ShMtFF48JuhP_r95Vtob1J0S91UuP61ktQGJsIDjtps")
+    try:
+        while True:
+           data = await websocket.receive_text()
+           await manager.send_personal_message(f"You wrote: {data}", websocket)
+           await manager.broadcast(f"Client #{client_id} says: {data}")
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
+        await manager.broadcast(f"Client #{client_id} left the chat")
