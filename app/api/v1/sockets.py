@@ -16,7 +16,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 SECRET_KEY = os.getenv('SECRET_KEY')
-from app.oauth2 import get_current_user
+from app.utils import get_current_user, oauth2_scheme
 
 
 class CustomOAuth2PasswordBearer(OAuth2PasswordBearer):
@@ -24,7 +24,7 @@ class CustomOAuth2PasswordBearer(OAuth2PasswordBearer):
         return await super().__call__(request or websocket)
 
 
-oauth2_scheme = CustomOAuth2PasswordBearer(tokenUrl="login")
+# oauth2_scheme = CustomOAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
 html = """
 <!DOCTYPE html>
@@ -77,7 +77,7 @@ class Settings(BaseModel):
 
 @router.get("/")
 async def get(token: str = Depends(oauth2_scheme)):
-    
+
     return HTMLResponse(html)
 
 @router.websocket('/chat')

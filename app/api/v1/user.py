@@ -30,6 +30,16 @@ def get_user(id: int, db: Session = Depends(get_db)):
      
      return user
 
+@router.get('/me', response_model=user_schema.UserOut)
+def get_user( db: Session = Depends(get_db), current_user: UserModel = Depends(utils.get_current_user)):
+
+     user = db.query(UserModel).filter(UserModel.id ==current_user.id).first()
+
+     if not user:
+          raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'User with id: {id} was not found')
+     
+     return user
+
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=user_schema.UserOut)
 def create_user(user: user_schema.UserCreate, db: Session = Depends(get_db)):
      timestamp = time.time()
@@ -59,3 +69,4 @@ def create_user(user: user_schema.UserCreate, db: Session = Depends(get_db)):
 #     }
 #     db[data.email] = user    # saving user to database
 #     return user
+
