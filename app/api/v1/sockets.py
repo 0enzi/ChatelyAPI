@@ -1,11 +1,15 @@
 from typing import Union
+from urllib.request import Request
 from fastapi import Cookie, Depends, Query, WebSocket, status
 from fastapi.responses import HTMLResponse
 from fastapi import APIRouter
 from fastapi import WebSocket, Depends
+from fastapi.templating import Jinja2Templates
 
 
-from app.utils import get_current_user
+from app.utils import get_current_user, oauth2_scheme
+
+templates = Jinja2Templates(directory="templates")
 html = """
 <!DOCTYPE html>
 <html>
@@ -51,16 +55,41 @@ html = """
 """
 router = APIRouter()
 
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: List[WebSocket] = []
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+
+    def disconnect(self, websocket: WebSocket):
+        self.active_connections.remove(websocket)
+
+    async def send_personal_message(self, message: str, websocket: WebSocket):
+        await websocket.send_text(message)
+
+    async def broadcast(self, message: str):
+        for connection in self.active_connections:
+            await connection.send_text(message)
+
+
+manager = ConnectionManager()
+
+
 
 @router.get("/")
-async def get():
-    return HTMLResponse(html)
+async def get(current_user : str = Depends(get_current_user)):
+    # print(get_current_user(token))
+    return {'user': current_user}
 
 async def get_cookie_or_token(
     websocket: WebSocket,
     session: Union[str, None] = Cookie(default=None),
     token: Union[str, None] = Query(default=None),
 ):
+
+
 
     if session is None and token is None:
         await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
