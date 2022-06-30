@@ -95,13 +95,11 @@ async def get_cookie_or_token(
 
 @router.websocket('/chat/{client_id}')
 async def websocket(websocket: WebSocket,   
-                    client_id: int,
-                    # token: str = Depends(get_cookie_or_token)
-                    ):
+                    client_id: int):
     
     await manager.connect(websocket)
     await websocket.send_text(f"Connected Successfully!!")
-    await websocket.send_text(f"Access Token for this session will be eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NTY1Njc5MjQsInN1YiI6ImFkbWluQGNoYXRlbHkuaW8ifQ.ShMtFF48JuhP_r95Vtob1J0S91UuP61ktQGJsIDjtps")
+    await websocket.send_text(f"Access Token for this session will be {token}")
     try:
         while True:
            data = await websocket.receive_text()

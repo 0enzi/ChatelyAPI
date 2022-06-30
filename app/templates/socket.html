@@ -3,52 +3,53 @@
   <head>
     <title>Chat</title>
   </head>
-  <body>
+  <body onload="script()"">
     <h1>Chately [WebSockets Test Client]</h1>
     <h2>Your Username: <span id="ws-name"></span></h2>
     <h2>Your ID: <span id="ws-id"></span></h2>
     <form action="" onsubmit="sendMessage(event)">
-      Insert Token:
-      <input
-        type="text"
-        value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NTY1Njc5MjQsInN1YiI6ImFkbWluQGNoYXRlbHkuaW8ifQ.ShMtFF48JuhP_r95Vtob1J0S91UuP61ktQGJsIDjtps"
-        autocomplete="off"
-      />
-
-      <br />
-      <br />
       Message here:
       <input type="text" id="messageText" autocomplete="off" />
       <button type="submit">Send</button>
     </form>
     <ul id="messages"></ul>
     <script>
+      var client_id = "";
       const userManager = (user) => {
         // console.log(user);
-        var client_id = Date.now();
+        // var client_id = Date.now();
+        client_id = user.user.websocket_id;
         document.querySelector("#ws-id").textContent = client_id;
 
         // ridiculously lazy to edit this
         // document.querySelector("#ws-id").textContent = user.user.websocket_id;
         document.querySelector("#ws-name").textContent = user.user.username;
+        client_id = user.user.websocket_id;
       };
 
-      // Some ajax
-      var user = {};
-      const url = "http://127.0.0.1:8000/api/v1/ws/";
-      fetch(url, {
+      
+      function script() {
+        const url = "http://127.0.0.1:8000/api/v1/ws/";
+        const Token =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NTY1Njc5MjQsInN1YiI6ImFkbWluQGNoYXRlbHkuaW8ifQ.ShMtFF48JuhP_r95Vtob1J0S91UuP61ktQGJsIDjtps";
+       
+        fetch(url, {
         method: "get",
         headers: new Headers({
-          Authorization:
-            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NTY1Njc5MjQsInN1YiI6ImFkbWluQGNoYXRlbHkuaW8ifQ.ShMtFF48JuhP_r95Vtob1J0S91UuP61ktQGJsIDjtps",
+          Authorization: `Bearer ${Token}`,
         }),
       })
         .then((response) => response.json())
         .then((text) => userManager(text));
 
-      var client_id = Date.now();
-      document.querySelector("#ws-id").textContent = client_id;
+        return "Initialized";
+      }
+      
 
+      document.querySelector("#ws-id").textContent = client_id;
+      console.log(client_id);
+
+       
       var ws = new WebSocket(`ws://localhost:8000/api/v1/ws/chat/${client_id}`);
       ws.onmessage = function (event) {
         var messages = document.getElementById("messages");
@@ -57,6 +58,8 @@
         message.appendChild(content);
         messages.appendChild(message);
       };
+      
+      
       function sendMessage(event) {
         var input = document.getElementById("messageText");
         ws.send(input.value);
