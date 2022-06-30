@@ -4,12 +4,10 @@ from pydantic import BaseModel, EmailStr
 
 
 class UserCreate(BaseModel):
-    id: int
     username: str
     email: EmailStr
     password: str
     status: bool
-    created_at: datetime
     is_active: Optional[bool] = True
     profile: str
     websocket_id: str

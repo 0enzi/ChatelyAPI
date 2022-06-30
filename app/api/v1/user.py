@@ -43,7 +43,7 @@ def get_user( db: Session = Depends(get_db), current_user: UserModel = Depends(u
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=user_schema.UserOut)
 def create_user(user: user_schema.UserCreate, db: Session = Depends(get_db)):
      timestamp = time.time()
-     hashed_pw = utils.hash(user.password)
+     hashed_pw = utils.get_hashed_password(user.password)
      user.password = hashed_pw
      user.websocket_id = str(timestamp)
      new_user = UserModel(**user.dict())
