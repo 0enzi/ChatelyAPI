@@ -1,6 +1,6 @@
 from typing import List
 from uuid import uuid4
-from ChatelyAPI.app.utils import get_current_user
+from app.utils import get_current_user
 from app.models.user import User as UserModel
 from app.schemas import user as user_schema
 from fastapi import  status, HTTPException, Depends, APIRouter
@@ -21,17 +21,17 @@ def get_users(db: Session = Depends(get_db)):
      
      return users 
 
-@router.get('/{id}', response_model=user_schema.UserOut)
-def get_user(id: int, db: Session = Depends(get_db)):
+# @router.get('/{id}', response_model=user_schema.UserOut)
+# def get_user(id: int, db: Session = Depends(get_db)):
 
-     user = db.query(UserModel).filter(UserModel.id ==id).first()
+#      user = db.query(UserModel).filter(UserModel.id ==id).first()
 
-     if not user:
-          raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'User with id: {id} was not found')
+#      if not user:
+#           raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'User with id: {id} was not found')
      
-     return user
+#      return user
 
-@router.get("/")
+@router.get("/me")
 async def get(current_user : str = Depends(get_current_user)):
     # print(get_current_user(token))
     return {'user': current_user}
