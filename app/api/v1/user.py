@@ -33,8 +33,17 @@ def get_users(db: Session = Depends(get_db)):
 
 @router.get("/me")
 async def get(current_user : str = Depends(get_current_user)):
-    # print(get_current_user(token))
-    return {'user': current_user}
+
+     user = {
+          'user_id': current_user.id,
+          'username': current_user.username,
+          'email': current_user.email,
+          'profile': current_user.profile,
+          'status': current_user.status,
+          'websocket_id': current_user.websocket_id,
+     }
+
+     return {'user': user}
 
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=user_schema.UserOut)
 def create_user(user: user_schema.UserCreate, db: Session = Depends(get_db)):
