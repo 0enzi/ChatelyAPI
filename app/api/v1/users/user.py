@@ -1,3 +1,4 @@
+import this
 from typing import List
 from uuid import uuid4
 from app.utils import get_current_user
@@ -31,6 +32,7 @@ def get_users(db: Session = Depends(get_db)):
      
 #      return user
 
+
 @router.get("/me")
 async def get(current_user : str = Depends(get_current_user)):
 
@@ -56,6 +58,26 @@ def create_user(user: user_schema.UserCreate, db: Session = Depends(get_db)):
      db.commit()
      db.refresh(new_user)
      return new_user 
+
+@router.put('/', status_code=status.HTTP_201_CREATED, response_model=user_schema.UserOut)
+def update_user(user: user_schema.UserUpdate,
+          current_user : str = Depends(get_current_user), 
+          db: Session = Depends(get_db)):
+
+
+
+    exists = db.query(UserModel).filter(UserModel.id == current_user.id).first() is not None
+    
+    if exists: # dont think if else is needed asthey both do the same thing
+        this_user = db.query(UserModel).filter_by(id = current_user.id).one()
+        this_user.username = user.username
+        this_user.profile = user.profile
+        db.add(this_user)
+        db.commit()
+        db.refresh(this_user)
+    else:
+        return {"message": "User does not exist"}
+    
 
 
 # @router.post('/signup', summary="Create new user", response_model=user_schema.UserOut)
