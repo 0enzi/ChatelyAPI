@@ -12,6 +12,14 @@ class UserCreate(BaseModel):
     profile: str
     websocket_id: str
 
+class UserUpdate(BaseModel):
+    username: str
+    # email: EmailStr
+    # password: str
+    # status: bool
+    # is_active: Optional[bool] = True
+    profile: str
+    # websocket_id: str
 
 class UserOut(BaseModel):
     id: int
