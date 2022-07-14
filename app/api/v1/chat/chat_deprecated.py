@@ -32,29 +32,6 @@ def read_messages(db: Session = Depends(get_db), skip: int = 0, limit: int = 100
     return messages
 
 
-
-def update_inbox(new_message, db: Session):
-
-    # Get sender and recipient ids and create an inbox hash
-    inbox_hash = f'{new_message.sender_id}-{new_message.recipient_id}'
-    exists = db.query(inbox_model.Inbox).filter(inbox_model.Inbox.inbox_hash == inbox_hash).first() is not None
-    
-    if exists: # dont think if else is needed asthey both do the same thing
-        inbox_item = db.query(inbox_model.Inbox).filter_by(inbox_hash =  inbox_hash).one()
-        inbox_item.last_message = new_message.msg
-
-        db.add(inbox_item)
-        db.commit()
-        db.refresh(inbox_item)
-    else:
-        inbox_item = inbox_model.Inbox(
-            inbox_hash=inbox_hash, 
-            last_message=new_message.msg,
-            user_id=new_message.recipient_id,
-            sender_id=new_message.sender_id)
-        db.add(inbox_item)
-        db.commit()
-        db.refresh(inbox_item)
     
 
 
