@@ -31,18 +31,12 @@ def get_one_inbox(inbox_hash, current_user : str = Depends(get_current_user),  d
     ids = inbox_hash.split('-')
     if current_user.id not in ids:
         return {'message': 'You are not authorized to view this inbox'}
-    else:
-        return {
-            'inbox_hash': inbox_hash,
-            'message': 'You are authorized to view this inbox'
-        }
-    inbox_list = db.query(inbox_model.Inbox).all()
+    inbox_item = db.query(inbox_model.Inbox).filter_by(inbox_hash =  inbox_hash).first()
+    # inbox_list = db.query(inbox_model.Inbox).all()
 
 
-    if not inbox_list:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'User with id: {id} was not found')
-     
-    return {current_user}
+   
+    return {inbox_item}
 
 
 
