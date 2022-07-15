@@ -3,7 +3,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 import time
 from app.utils import get_current_user
-from app import schemas, crud
+
 from app.models import inbox as inbox_model
 from app.api.deps import get_db
 
