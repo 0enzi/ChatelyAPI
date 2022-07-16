@@ -44,8 +44,14 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = 
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Incorrect email or password"
         )
+
     
+
+    encoded_user = {
+        'username': user['email'],
+        'user_id': user['id'],
+    }
     return {
-        "access_token": utils.create_access_token(user['email']),
+        "access_token": utils.create_access_token(encoded_user),
         "refresh_token": utils.create_refresh_token(user['email']),
     }

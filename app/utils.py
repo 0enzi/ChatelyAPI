@@ -1,6 +1,6 @@
 from fastapi import Depends, HTTPException
 from passlib.context import CryptContext
-import os
+import os, ast
 from datetime import datetime, timedelta
 from typing import Union, Any
 from jose import JWTError, jwt
@@ -61,7 +61,8 @@ async def get_current_user(token: str = Depends(oauth2_scheme),  db: Session = D
     )
     try:
         payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
+        user = ast.literal_eval(payload.get("sub"))
+        username: str = user['username']
         if username is None:
             raise credentials_exception
         token_data = TokenData(username=username)
@@ -69,6 +70,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme),  db: Session = D
         raise credentials_exception
 
     # user = get_user(fake_users_db, username=token_data.username)
+    
     user = db.query(UserModel).filter(UserModel.email ==token_data.username).first()
     if user is None:
         raise credentials_exception
