@@ -6,7 +6,7 @@ from app.utils import get_current_user
 
 from app.models import inbox as inbox_model
 from app.api.deps import get_db
-
+from app.schemas.chat import MessageCreate
 router = APIRouter()
 
 
@@ -30,18 +30,18 @@ def get_one_inbox(inbox_hash, current_user : str = Depends(get_current_user),  d
     """
     ids = inbox_hash.split('-')
     if current_user.id not in ids:
-        return {'message': 'You are not authorized to view this inbox'}
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,   detail=f'You ({current_user.id}) are not authorized to access this inbox')
     inbox_item = db.query(inbox_model.Inbox).filter_by(inbox_hash =  inbox_hash).first()
-    # inbox_list = db.query(inbox_model.Inbox).all()
-
-
+ 
    
     return {inbox_item}
 
 
 
+
 # Should be updated everytime a message is sent
-def update_inbox(new_message, db: Session):
+@router.post("/update")
+async def update_inbox(new_message: MessageCreate, db: Session = Depends(get_db)):
 
     # Get sender and recipient ids and create an inbox hash
     inbox_hash = f'{new_message.sender_id}-{new_message.recipient_id}'
