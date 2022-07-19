@@ -30,11 +30,13 @@ def get_one_inbox(inbox_hash, current_user : str = Depends(get_current_user),  d
     """
     ids = inbox_hash.split('-')
     if str(current_user.id) not in ids:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,   detail=f'You ({current_user.id}) are not authorized to access this inbox')
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f'You ({current_user.id}) are not authorized to access this inbox')
+    
+    
     inbox_item = db.query(inbox_model.Inbox).filter_by(inbox_hash =  inbox_hash).first()
- 
-   
-    return {inbox_item}
+    if inbox_item:
+        return {inbox_item}
+    raise HTTPException(status_code=404, detail="Inbox not found did you mean its reverse")
 
 
 
