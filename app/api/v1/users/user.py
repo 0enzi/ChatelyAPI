@@ -22,6 +22,7 @@ def get_users(db: Session = Depends(get_db)):
      
      return users 
 
+
 # @router.get('/{id}', response_model=user_schema.UserOut)
 # def get_user(id: int, db: Session = Depends(get_db)):
 
@@ -47,6 +48,7 @@ async def get(current_user : str = Depends(get_current_user)):
 
      return {'user': user}
 
+
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=user_schema.UserOut)
 def create_user(user: user_schema.UserCreate, db: Session = Depends(get_db)):
      timestamp = time.time()
@@ -59,12 +61,11 @@ def create_user(user: user_schema.UserCreate, db: Session = Depends(get_db)):
      db.refresh(new_user)
      return new_user 
 
+
 @router.put('/', status_code=status.HTTP_201_CREATED, response_model=user_schema.UserOut)
 def update_user(user: user_schema.UserUpdate,
           current_user : str = Depends(get_current_user), 
           db: Session = Depends(get_db)):
-
-
 
     exists = db.query(UserModel).filter(UserModel.id == current_user.id).first() is not None
     
