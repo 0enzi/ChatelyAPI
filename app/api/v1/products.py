@@ -38,7 +38,7 @@
 #     product = crud.product.get(db, model_id=product_in.id)
 #     if not product:
 #         raise HTTPException(
-#             status_code=status.HTTP_404_NOT_FOUND,
+            # status.HTTP_,
 #             detail="The product with this ID does not exist in the system.",
 #         )
 #     product = crud.product.update(db, db_obj=product, obj_in=product_in)

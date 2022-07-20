@@ -12,8 +12,8 @@ from app.schemas.token import TokenData
 from sqlalchemy.orm import Session
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 30  # 30 minutes
-# REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7 # 7 days
-REFRESH_TOKEN_EXPIRE_MINUTES = 1 # 1 min testing
+REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7 # 7 days
+# REFRESH_TOKEN_EXPIRE_MINUTES = 1 # 1 min testing
 ALGORITHM = "HS256"
 
 
