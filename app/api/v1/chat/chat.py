@@ -22,6 +22,25 @@ def get_inbox(db: Session = Depends(get_db), skip: int = 0, limit: int = 100) ->
      
     return inbox_list
 
+@router.get('/mine')
+def get_my_inbox(current_user: str = Depends(get_current_user), db: Session = Depends(get_db), skip: int = 0, limit: int = 100) -> Any:
+    """
+    Retrieve all inboxes.
+    """
+    inbox_list = db.query(inbox_model.Inbox).all()
+    my_inbox_list = []
+    for inbox in inbox_list:
+        inbox_hash = inbox.__dict__['inbox_hash'].split('-')
+        if f'{current_user.id}' in inbox_hash:
+            my_inbox_list.append(inbox)
+        else:
+            print("nope", f'{current_user.id}', inbox_hash)
+
+
+    if not my_inbox_list:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'User with id: {id} was not found')
+     
+    return my_inbox_list
 
 @router.get("/{inbox_hash}")
 def get_one_inbox(inbox_hash, current_user : str = Depends(get_current_user),  db: Session = Depends(get_db), skip: int = 0, limit: int = 100) -> Any:
@@ -33,7 +52,7 @@ def get_one_inbox(inbox_hash, current_user : str = Depends(get_current_user),  d
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f'You ({current_user.id}) are not authorized to access this inbox')
     
     
-    inbox_item = db.query(inbox_model.Inbox).filter_by(inbox_hash =  inbox_hash).first()
+    inbox_item = db.query(inbox_model.Inbox).filter_by(inbox_hash = inbox_hash).first()
     if inbox_item:
         return {inbox_item}
     raise HTTPException(status_code=404, detail="Inbox not found did you mean its reverse")
