@@ -1,10 +1,11 @@
 from typing import List, Any
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-import time
+
 from app.utils import get_current_user
 
 from app.models import inbox as inbox_model
+from app.models.user import User
 from app.api.deps import get_db
 from app.schemas.chat import MessageCreate
 router = APIRouter()
@@ -33,12 +34,35 @@ def get_my_inbox(current_user: str = Depends(get_current_user), db: Session = De
         inbox_hash = inbox.__dict__['inbox_hash'].split('-')
         if f'{current_user.id}' in inbox_hash:
             my_inbox_list.append(inbox)
-        else:
-            print("nope", f'{current_user.id}', inbox_hash)
+    
 
+    '''
+    Retouch the to auto detect who's the sender
+    '''
+    retouched_inbox = []
+    for inbox in my_inbox_list:
+        inbox_ids = inbox.__dict__['inbox_hash'].split('-')
+        if str(current_user.id) in inbox_ids:
+            inbox_ids.remove(str(current_user.id))
+        else:
+            print("error")
+        # retouch 
+        inbox.__dict__['sender_id'] = int(inbox_ids[0])
+        inbox.__dict__['reciepient_id'] = int(current_user.id)
+        reciepient_item = db.query(User).filter(User.id == int(inbox_ids[0])).first()
+        if reciepient_item:
+            inbox.__dict__['sender_name'] = db.query(User).filter(User.id == int(inbox_ids[0])).first()['username']
+        else: 
+            inbox.__dict__['sender_name'] = "John Doe"
+            
+        retouched_inbox.append(inbox.__dict__)
+ 
+
+
+    
 
     if not my_inbox_list:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'User with id: {id} was not found')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'No inboxes yet')
      
     return my_inbox_list
 
