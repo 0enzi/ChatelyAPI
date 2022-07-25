@@ -22,16 +22,18 @@ def get_users(db: Session = Depends(get_db)):
      
      return users 
 
+ 
 
-# @router.get('/{id}', response_model=user_schema.UserOut)
-# def get_user(id: int, db: Session = Depends(get_db)):
 
-#      user = db.query(UserModel).filter(UserModel.id ==id).first()
+@router.get('/single/{id}', response_model=user_schema.UserOut)
+def get_user(id: int, db: Session = Depends(get_db)):
 
-#      if not user:
-#           raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'User with id: {id} was not found')
+     user = db.query(UserModel).filter(UserModel.id ==id).first()
+
+     if not user:
+          raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'User with id: {id} was not found')
      
-#      return user
+     return user
 
 
 @router.get("/me")
