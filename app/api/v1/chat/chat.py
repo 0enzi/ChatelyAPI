@@ -49,11 +49,13 @@ def get_my_inbox(current_user: str = Depends(get_current_user), db: Session = De
         # retouch 
         inbox.__dict__['sender_id'] = int(inbox_ids[0])
         inbox.__dict__['reciepient_id'] = int(current_user.id)
+        inbox.__dict__['profile'] = 'default'
         reciepient_item = db.query(User).filter(User.id == int(inbox_ids[0])).first()
         if reciepient_item:
             inbox.__dict__['sender_name'] = db.query(User).filter(User.id == int(inbox_ids[0])).first().__dict__['username']
         else: 
             inbox.__dict__['sender_name'] = "John Doe"
+        
         retouched_inbox.append(inbox.__dict__)
  
 
