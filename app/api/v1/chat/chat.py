@@ -121,24 +121,36 @@ def connect_to_redis():
 
 def get_data(redis_connection):
     last_id = 0
-    sleep_ms = 5000
+    # sleep_ms = 5000
     stream_key = '0_0_0_0:1-9:stream'
-    while True:
+    messages_list = []
+
+    for i in range(15):
         try:
             resp = redis_connection.xread(
-                {stream_key: last_id}, count=1, block=sleep_ms
+                {stream_key: last_id}, count=1
             )
             if resp:
                 key, messages = resp[0]
                 last_id, data = messages[0]
-                print("REDIS ID: ", last_id)
-                print("      --> ", data)
-
+                
+                # print("REDIS ID: ", last_id)
+                msg_dict = {
+                    'username': data[b'uname'].decode('utf-8'),
+                    'msg': data[b'msg'].decode('utf-8'),
+                }
+                # print(i, msg_dict)
+                # print(msg_dict)
+                messages_list.append(msg_dict)
+    
         except ConnectionError as e:
             print("ERROR REDIS CONNECTION: {}".format(e))
+        
+    return messages_list
 
-@router.get("/msg/{inbox_hash}")
-async def get_chats_in_inbox(inbox_hash, current_user : str = Depends(get_current_user),  db: Session = Depends(get_db), skip: int = 0, limit: int = 100) -> Any:
+
+@router.get("/msg/")
+async def get_chats_in_inbox(current_user : str = Depends(get_current_user),  db: Session = Depends(get_db), skip: int = 0, limit: int = 100) -> Any:
     """
     Retrieve latest messages from inbox
     """
@@ -156,6 +168,6 @@ async def get_chats_in_inbox(inbox_hash, current_user : str = Depends(get_curren
                  db=0)
 
     connection = connect_to_redis()
-    print(get_data(connection))
+    messages = get_data(connection)
     
-    return "Hello?"
+    return messages
