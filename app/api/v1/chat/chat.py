@@ -119,11 +119,12 @@ def connect_to_redis():
     r = Redis(hostname, port, retry_on_timeout=True)
     return r
 
-def get_data(redis_connection):
+def get_data(redis_connection, inbox_hash:str):
     last_id = 0
     # sleep_ms = 5000
-    stream_key = '0_0_0_0:1-9:stream'
+    stream_key = f'0_0_0_0:{inbox_hash}:stream'
     messages_list = []
+    print(stream_key)
 
     for i in range(15):
         try:
@@ -149,8 +150,8 @@ def get_data(redis_connection):
     return messages_list
 
 
-@router.get("/msg/")
-async def get_chats_in_inbox(current_user : str = Depends(get_current_user),  db: Session = Depends(get_db), skip: int = 0, limit: int = 100) -> Any:
+@router.get("/msg/{inbox_hash}")
+async def get_chats_in_inbox(inbox_hash: str, current_user : str = Depends(get_current_user),  db: Session = Depends(get_db), skip: int = 0, limit: int = 100) -> Any:
     """
     Retrieve latest messages from inbox
     """
@@ -167,7 +168,8 @@ async def get_chats_in_inbox(current_user : str = Depends(get_current_user),  db
                  port=6379, 
                  db=0)
 
+    
     connection = connect_to_redis()
-    messages = get_data(connection)
+    messages = get_data(connection, inbox_hash)
     
     return messages
