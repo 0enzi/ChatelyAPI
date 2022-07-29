@@ -1,9 +1,7 @@
 from typing import List, Any
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-
 from app.utils import get_current_user
-
 from app.models import inbox as inbox_model
 from app.models.user import User
 from app.api.deps import get_db
@@ -11,8 +9,6 @@ from app.schemas.chat import MessageCreate
 import redis
 from redis import Redis
 router = APIRouter()
-
-
 
 @router.get("/all")
 def get_inbox(db: Session = Depends(get_db), skip: int = 0, limit: int = 100) -> Any:
@@ -25,6 +21,7 @@ def get_inbox(db: Session = Depends(get_db), skip: int = 0, limit: int = 100) ->
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'User with id: {id} was not found')
      
     return inbox_list
+
 
 @router.get('/mine')
 def get_my_inbox(current_user: str = Depends(get_current_user), db: Session = Depends(get_db), skip: int = 0, limit: int = 100) -> Any:
@@ -119,12 +116,16 @@ def connect_to_redis():
     r = Redis(hostname, port, retry_on_timeout=True)
     return r
 
+
 def get_data(redis_connection, inbox_hash:str):
+    '''
+    Get data from redis w/xread
+    '''
     last_id = 0
     # sleep_ms = 5000
     stream_key = f'0_0_0_0:{inbox_hash}:stream'
     messages_list = []
-    print(stream_key)
+    
 
     for i in range(15):
         try:
@@ -155,19 +156,6 @@ async def get_chats_in_inbox(inbox_hash: str, current_user : str = Depends(get_c
     """
     Retrieve latest messages from inbox
     """
-    
-    # ids = inbox_hash.split('-')
-    # if str(current_user.id) not in ids:
-    #     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f'You ({current_user.id}) are not authorized to access this inbox')
-    
-    
-    # inbox_item = db.query(inbox_model.Inbox).filter_by(inbox_hash = inbox_hash).first()
-    # if inbox_item:
-    #     return {inbox_item}
-    rd = redis.Redis(host='localhost', 
-                 port=6379, 
-                 db=0)
-
     
     connection = connect_to_redis()
     messages = get_data(connection, inbox_hash)
