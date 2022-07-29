@@ -4,9 +4,9 @@ from fastapi.responses import HTMLResponse
 app = FastAPI()
 
 
-@app.get("/")
-async def get():
-    return HTMLResponse(html)
+# @app.get("/")
+# async def get():
+#     return HTMLResponse(html)
 
 
 @app.websocket("/ws")
