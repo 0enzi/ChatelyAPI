@@ -8,7 +8,10 @@ from app.models import inbox as inbox_model
 from app.models.user import User
 from app.api.deps import get_db
 from app.schemas.chat import MessageCreate
+import redis
+from redis import Redis
 router = APIRouter()
+
 
 
 @router.get("/all")
@@ -83,8 +86,6 @@ def get_one_inbox(inbox_hash, current_user : str = Depends(get_current_user),  d
     raise HTTPException(status_code=404, detail="Inbox not found did you mean its reverse")
 
 
-
-
 # Should be updated everytime a message is sent
 @router.post("/update")
 async def update_inbox(new_message: MessageCreate, db: Session = Depends(get_db)):
@@ -109,3 +110,52 @@ async def update_inbox(new_message: MessageCreate, db: Session = Depends(get_db)
         db.add(inbox_item)
         db.commit()
         db.refresh(inbox_item)
+
+
+def connect_to_redis():
+    hostname = "localhost"
+    port = 6379
+
+    r = Redis(hostname, port, retry_on_timeout=True)
+    return r
+
+def get_data(redis_connection):
+    last_id = 0
+    sleep_ms = 5000
+    stream_key = '0_0_0_0:1-9:stream'
+    while True:
+        try:
+            resp = redis_connection.xread(
+                {stream_key: last_id}, count=1, block=sleep_ms
+            )
+            if resp:
+                key, messages = resp[0]
+                last_id, data = messages[0]
+                print("REDIS ID: ", last_id)
+                print("      --> ", data)
+
+        except ConnectionError as e:
+            print("ERROR REDIS CONNECTION: {}".format(e))
+
+@router.get("/msg/{inbox_hash}")
+async def get_chats_in_inbox(inbox_hash, current_user : str = Depends(get_current_user),  db: Session = Depends(get_db), skip: int = 0, limit: int = 100) -> Any:
+    """
+    Retrieve latest messages from inbox
+    """
+    
+    # ids = inbox_hash.split('-')
+    # if str(current_user.id) not in ids:
+    #     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f'You ({current_user.id}) are not authorized to access this inbox')
+    
+    
+    # inbox_item = db.query(inbox_model.Inbox).filter_by(inbox_hash = inbox_hash).first()
+    # if inbox_item:
+    #     return {inbox_item}
+    rd = redis.Redis(host='localhost', 
+                 port=6379, 
+                 db=0)
+
+    connection = connect_to_redis()
+    print(get_data(connection))
+    
+    return "Hello?"
